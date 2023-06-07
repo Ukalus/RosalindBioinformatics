@@ -20,36 +20,59 @@
 
 # Return: The probability that two randomly selected mating organisms will produce an individual possessing a dominant allele (and thus displaying the dominant phenotype). Assume that any two organisms can mate.
 
+# Note: THIS IS STILL NOT WORKING :(
 
-organism_k = {
-    "traits": ["Y","Y"]
-}
+from enum import Enum
+class Allele(Enum):
+    DOMINANT = 1,
+    RECESSIVE = 2,
+    HET = 3
 
+def mate(x,y):
+    if x == Allele.DOMINANT and y == Allele.DOMINANT:
+        return [Allele.DOMINANT]*4
+    if x == Allele.RECESSIVE and y == Allele.RECESSIVE:
+        return [Allele.RECESSIVE]*4
+    if x == Allele.HET and y == Allele.HET:
+        return [Allele.DOMINANT,Allele.HET,Allele.HET,Allele.RECESSIVE]
+    if x == Allele.HET:
+        return [Allele.HET, Allele.HET, y, y]
+    if y == Allele.HET:
+        return [Allele.HET, Allele.HET, x, x] 
+    else:
+        return [Allele.HET]*4
 
-organism_m = {
-    "traits": ["Y","y"]
-}
-
-organism_n = {
-    "traits": ["y","y"]
-}
-
-organisms = [organism_k,organism_k,organism_m,organism_m,organism_k,organism_k]
-
-
-
-def generateOutcomes(organisms):
-    trait_set = []
-    for organism in organisms:
-        trait_set.append(organism["traits"][0])
-        trait_set.append(organism["traits"][1])
+def getPairs(organisms):
     
-    for i in range(0,len(trait_set)):
-        for j in range(0,len(trait_set)-i):
-            print(f"{trait_set[i]} + {trait_set[j]}")
+    if len(organisms) < 2:
+        return list()
+    first = organisms[0]
+    pairs = [(first,organisms[second_index]) for second_index in range(1,len(organisms))]
+    other_pairs = getPairs(organisms[1:])
+    pairs.extend(other_pairs)
+    return pairs
+          
+def f(k,m,n):
+    organisms = list()
+    for i in range(k):
+        organisms.append(Allele.DOMINANT)
+    for i in range(m):
+        organisms.append(Allele.RECESSIVE)
+    for i in range(n):
+        organisms.append(Allele.HET)
+    pairs = getPairs(organisms)
+    children_list = [mate(*p) for p in pairs]
+    children = [child for sublist in children_list for child in sublist]
+    count_children = len(children)
+    count_dominant_presence = 0
+    for child in children:
+        if child is not Allele.RECESSIVE:
+            count_dominant_presence += 1
+    return round(count_dominant_presence / count_children,5)
 
-generateOutcomes(organisms)
 
+k = 21
+m = 21
+n = 30
 
-
-
+print(f(k,m,n))

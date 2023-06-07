@@ -21,4 +21,4 @@ def rabbitPopulation(months,offspring, starting_pop):
     return(generation2) 
 
 
-print(rabbitPopulation(5,3,1))
+print(rabbitPopulation(35,5,1))
